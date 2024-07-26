@@ -29,6 +29,57 @@ document.addEventListener("DOMContentLoaded", function () {
     updatePagination();
   }
 
+  // Rimuove tutte le citazioni dal localStorage e dalla lista visuale
+  function clearQuotes() {
+    quotes = [];
+    favoriteQuotes = [];
+    localStorage.removeItem("quotes");
+    localStorage.removeItem("favoriteQuotes");
+    currentPage = 1;
+    displayQuotes();
+    displayFavoriteQuotes();
+  }
+
+  // Salva una nuova citazione nel localStorage
+  function saveQuote(text, author) {
+    quotes.push({ text, author });
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+    displayQuotes();
+  }
+
+  // Funzione per cancellare una citazione
+  function deleteQuote(index) {
+    const [removedQuote] = quotes.splice(index, 1);
+    localStorage.setItem("quotes", JSON.stringify(quotes));
+    removeFromFavorites(removedQuote);
+    displayQuotes();
+  }
+  
+  // Aggiungi una citazione alla lista visuale
+  function addQuoteToList(text, author, index) {
+    const quoteItem = document.createElement("div");
+    quoteItem.className = "quote-item";
+    quoteItem.innerHTML = `
+                <p>"${text}"</p>
+                <footer class="blockquote-footer">${author}</footer>
+                <button class="btn btn-sm btn-outline-primary favorite-btn">Favorite</button>
+                <button class="btn btn-sm btn-outline-danger delete-btn">Delete</button>
+            `;
+    quoteList.appendChild(quoteItem);
+
+    // Aggiungi event listener per segnare come preferita
+    const favoriteBtn = quoteItem.querySelector(".favorite-btn");
+    favoriteBtn.addEventListener("click", function () {
+      toggleFavoriteQuote(index);
+    });
+
+    // Aggiungi event listener per cancellare la citazione
+    const deleteBtn = quoteItem.querySelector(".delete-btn");
+    deleteBtn.addEventListener("click", function () {
+      deleteQuote(index);
+    });
+  }
+
   // Funzione per aggiornare la paginazione
   function updatePagination() {
     pagination.innerHTML = "";
@@ -50,46 +101,6 @@ document.addEventListener("DOMContentLoaded", function () {
       pageItem.appendChild(pageLink);
       pagination.appendChild(pageItem);
     }
-  }
-
-  // Salva una nuova citazione nel localStorage
-  function saveQuote(text, author) {
-    quotes.push({ text, author });
-    localStorage.setItem("quotes", JSON.stringify(quotes));
-    displayQuotes();
-  }
-
-  // Aggiungi una citazione alla lista visuale
-  function addQuoteToList(text, author, index) {
-    const quoteItem = document.createElement("div");
-    quoteItem.className = "quote-item";
-    quoteItem.innerHTML = `
-            <p>"${text}"</p>
-            <footer class="blockquote-footer">${author}</footer>
-            <button class="btn btn-sm btn-outline-primary favorite-btn">Favorite</button>
-            <button class="btn btn-sm btn-outline-danger delete-btn">Delete</button>
-        `;
-    quoteList.appendChild(quoteItem);
-
-    // Aggiungi event listener per segnare come preferita
-    const favoriteBtn = quoteItem.querySelector(".favorite-btn");
-    favoriteBtn.addEventListener("click", function () {
-      toggleFavoriteQuote(index);
-    });
-
-    // Aggiungi event listener per cancellare la citazione
-    const deleteBtn = quoteItem.querySelector(".delete-btn");
-    deleteBtn.addEventListener("click", function () {
-      deleteQuote(index);
-    });
-  }
-
-  // Funzione per cancellare una citazione
-  function deleteQuote(index) {
-    const [removedQuote] = quotes.splice(index, 1);
-    localStorage.setItem("quotes", JSON.stringify(quotes));
-    removeFromFavorites(removedQuote);
-    displayQuotes();
   }
 
   // Funzione per rimuovere una citazione dalla lista dei preferiti
@@ -140,17 +151,6 @@ document.addEventListener("DOMContentLoaded", function () {
             <footer class="blockquote-footer">${author}</footer>
         `;
     favoriteQuoteList.appendChild(quoteItem);
-  }
-
-  // Rimuove tutte le citazioni dal localStorage e dalla lista visuale
-  function clearQuotes() {
-    quotes = [];
-    favoriteQuotes = [];
-    localStorage.removeItem("quotes");
-    localStorage.removeItem("favoriteQuotes");
-    currentPage = 1;
-    displayQuotes();
-    displayFavoriteQuotes();
   }
 
   // Gestione del submit del form
