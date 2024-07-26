@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function() {
     const quoteList = document.getElementById('quote-list');
     const favoriteQuoteList = document.getElementById('favorite-quote-list');
@@ -62,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function() {
             <p>"${text}"</p>
             <footer class="blockquote-footer">${author}</footer>
             <button class="btn btn-sm btn-outline-primary favorite-btn">Favorite</button>
+            <button class="btn btn-sm btn-outline-danger delete-btn">Delete</button>
         `;
         quoteList.appendChild(quoteItem);
 
@@ -70,6 +70,30 @@ document.addEventListener("DOMContentLoaded", function() {
         favoriteBtn.addEventListener('click', function() {
             toggleFavoriteQuote(index);
         });
+
+        // Aggiungi event listener per cancellare la citazione
+        const deleteBtn = quoteItem.querySelector('.delete-btn');
+        deleteBtn.addEventListener('click', function() {
+            deleteQuote(index);
+        });
+    }
+
+    // Funzione per cancellare una citazione
+    function deleteQuote(index) {
+        const [removedQuote] = quotes.splice(index, 1);
+        localStorage.setItem('quotes', JSON.stringify(quotes));
+        removeFromFavorites(removedQuote);
+        displayQuotes();
+    }
+
+    // Funzione per rimuovere una citazione dalla lista dei preferiti
+    function removeFromFavorites(quote) {
+        const favoriteIndex = favoriteQuotes.findIndex(q => q.text === quote.text && q.author === quote.author);
+        if (favoriteIndex > -1) {
+            favoriteQuotes.splice(favoriteIndex, 1);
+            localStorage.setItem('favoriteQuotes', JSON.stringify(favoriteQuotes));
+            displayFavoriteQuotes();
+        }
     }
 
     // Aggiungi una citazione alla lista dei preferiti
